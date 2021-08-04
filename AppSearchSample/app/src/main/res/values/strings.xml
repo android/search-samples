@@ -16,4 +16,12 @@
 
 <resources>
   <string name="app_name">AppSearch Sample</string>
+  <string name="no_notes_message">No notes found! Start by adding a note.</string>
+  <string name="search_bar_title">Search Notes</string>
+  <string name="search_bar_hint">Enter search text</string>
+  <string name="add_note_hint">Enter note text</string>
+  <string name="add_note_button_text">Add Note</string>
+  <string name="add_note_dialog_title">Add a new note</string>
+  <string name="add_note_dialog_cancel">Cancel</string>
+  <string name="add_note_dialog_save">Save</string>
 </resources>
