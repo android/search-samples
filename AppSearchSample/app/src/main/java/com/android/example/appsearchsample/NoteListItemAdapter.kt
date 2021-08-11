@@ -13,13 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.android.example.appsearchsample
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -27,7 +24,7 @@ import com.android.example.appsearchsample.databinding.ItemNoteBinding
 import com.android.example.appsearchsample.model.Note
 
 /**
- * Adapter for displaying a list of {@link Note} objects.
+ * Adapter for displaying a list of [Note] objects.
  */
 class NoteListItemAdapter(private val onDelete: (Note?) -> Unit) :
   ListAdapter<Note, NoteListItemAdapter.NoteViewHolder>(NOTES_COMPARATOR) {
@@ -38,8 +35,8 @@ class NoteListItemAdapter(private val onDelete: (Note?) -> Unit) :
   ): NoteViewHolder {
     val view: ItemNoteBinding = ItemNoteBinding.inflate(
       LayoutInflater.from(parent.context),
-      parent, /*attachToRoot=*/
-      false
+      parent,
+      /*attachToRoot=*/false
     )
 
     return NoteViewHolder(view)
@@ -49,12 +46,12 @@ class NoteListItemAdapter(private val onDelete: (Note?) -> Unit) :
     holder.bind(getItem(position), onDelete)
   }
 
-  /** ViewHolder for {@link NoteListItemAdapter}. */
+  /** ViewHolder for [NoteListItemAdapter]. */
   class NoteViewHolder(
     binding: ItemNoteBinding,
   ) : RecyclerView.ViewHolder(binding.root) {
-    private val noteTextView: TextView = binding.noteText
-    private val noteDeleteButtonView: Button = binding.noteDeleteButton
+    private val noteTextView = binding.noteText
+    private val noteDeleteButtonView = binding.noteDeleteButton
 
     fun bind(note: Note?, onDelete: (Note?) -> Unit) {
       noteTextView.text = note?.text
@@ -65,12 +62,12 @@ class NoteListItemAdapter(private val onDelete: (Note?) -> Unit) :
   companion object {
     private val NOTES_COMPARATOR = object : DiffUtil.ItemCallback<Note>() {
       override fun areItemsTheSame(oldItem: Note, newItem: Note): Boolean {
-        // TODO: Check for the same Note id instead of text.
-        return oldItem.text === newItem.text
+        return oldItem.id === newItem.id &&
+          oldItem.namespace === newItem.namespace
       }
 
       override fun areContentsTheSame(oldItem: Note, newItem: Note): Boolean {
-        return oldItem.text == newItem.text
+        return oldItem == newItem
       }
     }
   }

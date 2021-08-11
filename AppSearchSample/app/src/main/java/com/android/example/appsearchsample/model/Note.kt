@@ -13,14 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.android.example.appsearchsample.model
 
+import androidx.appsearch.annotation.Document
+import androidx.appsearch.app.AppSearchSchema
+import androidx.appsearch.app.GenericDocument
+
 /**
- * Data representation for a user-created {@link Note} object.
+ * Data representation for a user-created [Note] object.
+ *
+ * The [Document] annotation marks this class as an AppSearch document class.
+ * This allows the AppSearch compiler to generate classes required to convert
+ * this class to and from [GenericDocument], the basic unit of data in
+ * AppSearch.
  */
+@Document
 data class Note(
+  /** Namespace for Note */
+  @Document.Namespace
+  val namespace: String = "user",
+
+  /** Id for Note */
+  @Document.Id
+  val id: String,
+
   /** Field for text that that user inputs */
+  @Document.StringProperty(
+    indexingType = AppSearchSchema.StringPropertyConfig.INDEXING_TYPE_PREFIXES
+  )
   val text: String
-  // TODO: Make this an AppSearch document class and index text.
 )

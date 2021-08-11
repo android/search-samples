@@ -13,37 +13,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.android.example.appsearchsample
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.View
 import android.widget.EditText
 import android.widget.SearchView
+import android.widget.Toast
+import android.widget.Toast.LENGTH_LONG
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.android.example.appsearchsample.databinding.ActivityMainBinding
+import com.android.example.appsearchsample.model.Note
 import com.android.example.appsearchsample.model.NoteViewModel
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 
 /**
  * Activity to set up a simple AppSearch demo.
  *
- * <p>This activity allows the user add a note by inputting their desired text
+ * This activity allows the user to add a note by inputting their desired text
  * into the dialog prompt. Once a note is added, it is indexed into AppSearch.
  * The user can then use the search bar to put input terms to find notes that
  * match.
  *
- * <p>By default, the notes list displays all notes that have been indexed. Once
+ * By default, the notes list displays all notes that have been indexed. Once
  * the user submits a query, the list is updated to reflect notes that match
  * the query.
  */
 class MainActivity : AppCompatActivity() {
-  private val noteViewModel: NoteViewModel by viewModels()
+  private val noteViewModel: NoteViewModel by viewModels {
+    NoteViewModel.NoteViewModelFactory(application)
+  }
 
   private lateinit var activityBinding: ActivityMainBinding
   private lateinit var searchView: SearchView
@@ -58,7 +62,7 @@ class MainActivity : AppCompatActivity() {
     initAddNoteButtonListener()
     initNoteListView()
 
-    noteViewModel.noteLiveData.observe(
+    noteViewModel.queryNotes().observe(
       this,
       {
         notesAdapter.submitList(it)
@@ -70,7 +74,14 @@ class MainActivity : AppCompatActivity() {
           activityBinding.notesList.visibility = View.VISIBLE
           activityBinding.noNotesMessage.visibility = View.GONE
         }
-      })
+      }
+    )
+
+    noteViewModel.errorMessageLiveData.observe(this, {
+      it?.let {
+        Toast.makeText(applicationContext, it, LENGTH_LONG).show()
+      }
+    })
   }
 
   override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -87,11 +98,14 @@ class MainActivity : AppCompatActivity() {
     searchView.queryHint = getString(R.string.search_bar_hint)
     searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
       override fun onQueryTextSubmit(query: String): Boolean {
-        // TODO: Submit query to AppSearch, and update adapter with results.
+        noteViewModel.queryNotes(query)
         return false
       }
 
       override fun onQueryTextChange(newText: String): Boolean {
+        // This resets the notes list to display all notes if the query is
+        // cleared.
+        if (newText.isEmpty()) noteViewModel.queryNotes()
         return false
       }
     })
@@ -100,8 +114,8 @@ class MainActivity : AppCompatActivity() {
   /**
    * Initializes listener for insert note button.
    *
-   * <p>The listener configures an alert dialog for the user to input text
-   * to save as a {@link Note} object.
+   * The listener configures an alert dialog for the user to input text
+   * to save as a [Note] document.
    */
   private fun initAddNoteButtonListener() {
     val insertNoteButton: ExtendedFloatingActionButton =
@@ -130,10 +144,12 @@ class MainActivity : AppCompatActivity() {
     }
   }
 
-  /** Initializes recycler view for list of {@link Note} objects. */
+  /** Initializes recycler view for list of [Note] documents. */
   private fun initNoteListView() {
     notesAdapter = NoteListItemAdapter {
-      // TODO: Call Note ViewModel to delete Note
+      if (it != null) {
+        noteViewModel.removeNote(it.namespace, it.id)
+      }
     }
     activityBinding.notesList.adapter = notesAdapter
     activityBinding.notesList.addItemDecoration(

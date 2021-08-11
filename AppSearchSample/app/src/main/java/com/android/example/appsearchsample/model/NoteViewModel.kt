@@ -13,28 +13,105 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.android.example.appsearchsample.model
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import com.android.example.appsearchsample.NoteAppSearchManager
+import java.util.UUID
+import kotlinx.coroutines.launch
 
 /**
- * ViewModel for interacting with {@link Note} objects.
+ * ViewModel for interacting with [Note] documents.
  */
-class NoteViewModel : ViewModel() {
-  private val noteList = mutableListOf<Note>()
-  private val _noteLiveData: MutableLiveData<List<Note>> =
-    MutableLiveData(noteList)
+class NoteViewModel(application: Application) : AndroidViewModel(application) {
 
-  val noteLiveData: LiveData<List<Note>>
-    get() = _noteLiveData
+  // Posts an error message if an AppSearch operation fails.
+  private val _errorMessageLiveData = MutableLiveData<String?>()
+  val errorMessageLiveData: LiveData<String?> = _errorMessageLiveData
 
-  /** Adds another {@link Note} object. */
+  private val _noteLiveData: MutableLiveData<List<Note>> = MutableLiveData(mutableListOf())
+  private val noteLiveData: LiveData<List<Note>> = _noteLiveData
+
+  private val noteAppSearchManager: NoteAppSearchManager =
+    NoteAppSearchManager(getApplication(), viewModelScope)
+
+  /**
+   * Adds a new [Note] document to the AppSearch database.
+   *
+   * After the [Note] document is added, the database is queried to update
+   * the note list with all notes in the database (including the added [Note]
+   * document).
+   *
+   * On error, posts a message to [errorMessageLiveData].
+   *
+   * @param text text to create [Note] document for.
+   */
   fun addNote(text: String) {
-    val note = Note(text)
-    noteList.add(note)
-    _noteLiveData.value = noteList
+    val id = UUID.randomUUID().toString()
+    val note = Note(id = id, text = text)
+    viewModelScope.launch {
+      val result = noteAppSearchManager.addNote(note)
+      if (!result.isSuccess) {
+        _errorMessageLiveData.postValue("Failed to add note with id: $id and text: $text")
+      }
+
+      queryNotes()
+    }
+  }
+
+  /**
+   * Removes a [Note] document from the AppSearch database.
+   *
+   * After the [Note] document is removed, the database is queried to update the the note list with
+   * all notes in the database.
+   *
+   * On error, posts a message to [errorMessageLiveData].
+   */
+  fun removeNote(namespace: String, id: String) {
+    viewModelScope.launch {
+      val result = noteAppSearchManager.removeNote(namespace, id)
+      if (!result.isSuccess) {
+        _errorMessageLiveData.postValue(
+          "Failed to remove note in namespace: $namespace with id: $id"
+        )
+      }
+
+      queryNotes()
+    }
+  }
+
+  /**
+   * Retrieves [Note] documents that match the query from the AppSearch
+   * database.
+   *
+   * If no query is provided, this retrieves all [Note] documents in the
+   * database.
+   */
+  fun queryNotes(query: String = ""): LiveData<List<Note>> {
+    viewModelScope.launch {
+      val resultNotes = noteAppSearchManager.queryLatestNotes(query)
+      _noteLiveData.postValue(resultNotes)
+    }
+    return noteLiveData
+  }
+
+  /**
+   * Factory for creating a [NoteAppSearchManager] instance.
+   */
+  class NoteViewModelFactory(private val application: Application) :
+    ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+      if (modelClass.isAssignableFrom(NoteViewModel::class.java)) {
+        @Suppress("UNCHECKED_CAST")
+        return NoteViewModel(application) as T
+      }
+      throw IllegalArgumentException("Unknown ViewModel class")
+    }
   }
 }
