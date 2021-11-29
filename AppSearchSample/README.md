@@ -35,7 +35,7 @@ Support
   - https://issuetracker.google.com/issues/new?component=1012737&template=1551039
 
 If you've found an error in this sample, please file an issue:
-https://github.com/android/search/issues
+https://github.com/android/search-samples/issues
 
 Patches are encouraged, and may be submitted by forking this project and
 submitting a pull request through GitHub. Please see CONTRIBUTING.md for more
