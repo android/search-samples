@@ -16,6 +16,7 @@
 package com.android.example.appsearchsample.model
 
 import android.app.Application
+import androidx.appsearch.app.SearchResult
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -35,8 +36,8 @@ class NoteViewModel(application: Application) : AndroidViewModel(application) {
   private val _errorMessageLiveData = MutableLiveData<String?>()
   val errorMessageLiveData: LiveData<String?> = _errorMessageLiveData
 
-  private val _noteLiveData: MutableLiveData<List<Note>> = MutableLiveData(mutableListOf())
-  private val noteLiveData: LiveData<List<Note>> = _noteLiveData
+  private val _noteLiveData: MutableLiveData<List<SearchResult>> = MutableLiveData(mutableListOf())
+  private val noteLiveData: LiveData<List<SearchResult>> = _noteLiveData
 
   private val noteAppSearchManager: NoteAppSearchManager =
     NoteAppSearchManager(getApplication(), viewModelScope)
@@ -93,7 +94,7 @@ class NoteViewModel(application: Application) : AndroidViewModel(application) {
    * If no query is provided, this retrieves all [Note] documents in the
    * database.
    */
-  fun queryNotes(query: String = ""): LiveData<List<Note>> {
+  fun queryNotes(query: String = ""): LiveData<List<SearchResult>> {
     viewModelScope.launch {
       val resultNotes = noteAppSearchManager.queryLatestNotes(query)
       _noteLiveData.postValue(resultNotes)

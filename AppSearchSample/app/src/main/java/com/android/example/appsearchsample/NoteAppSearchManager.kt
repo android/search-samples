@@ -20,6 +20,7 @@ import androidx.appsearch.app.AppSearchBatchResult
 import androidx.appsearch.app.AppSearchSession
 import androidx.appsearch.app.PutDocumentsRequest
 import androidx.appsearch.app.RemoveByDocumentIdRequest
+import androidx.appsearch.app.SearchResult
 import androidx.appsearch.app.SearchSpec
 import androidx.appsearch.app.SearchSpec.RANKING_STRATEGY_CREATION_TIMESTAMP
 import androidx.appsearch.app.SetSchemaRequest
@@ -94,7 +95,7 @@ class NoteAppSearchManager(context: Context, coroutineScope: CoroutineScope) {
    * they were created (with most recent first). This returns a maximum of 10
    * documents that match the query, per AppSearch default page size.
    */
-  suspend fun queryLatestNotes(query: String): List<Note> {
+  suspend fun queryLatestNotes(query: String): List<SearchResult> {
     awaitInitialization()
 
     val searchSpec = SearchSpec.Builder()
@@ -102,10 +103,7 @@ class NoteAppSearchManager(context: Context, coroutineScope: CoroutineScope) {
       .build()
 
     val searchResults = appSearchSession.search(query, searchSpec)
-    val searchResultsPage = searchResults.nextPage.await()
-    return searchResultsPage.map {
-      it.genericDocument.toDocumentClass(Note::class.java)
-    }
+    return searchResults.nextPage.await()
   }
 
   /**

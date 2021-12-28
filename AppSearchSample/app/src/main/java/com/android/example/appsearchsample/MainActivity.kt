@@ -65,7 +65,7 @@ class MainActivity : AppCompatActivity() {
     noteViewModel.queryNotes().observe(
       this,
       {
-        notesAdapter.submitList(it)
+        notesAdapter.submitList(it.map { it2 -> it2.genericDocument.toDocumentClass(Note::class.java) })
         activityBinding.progressSpinner.visibility = View.GONE
         if (it.isEmpty()) {
           activityBinding.notesList.visibility = View.GONE
