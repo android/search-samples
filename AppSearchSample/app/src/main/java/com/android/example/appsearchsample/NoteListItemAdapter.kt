@@ -15,8 +15,11 @@
  */
 package com.android.example.appsearchsample
 
+import android.graphics.Color
+import android.text.SpannableStringBuilder
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.text.bold
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -28,6 +31,8 @@ import com.android.example.appsearchsample.model.Note
  */
 class NoteListItemAdapter(private val onDelete: (Note?) -> Unit) :
   ListAdapter<Note, NoteListItemAdapter.NoteViewHolder>(NOTES_COMPARATOR) {
+
+  var query: String = ""
 
   override fun onCreateViewHolder(
     parent: ViewGroup,
@@ -43,18 +48,34 @@ class NoteListItemAdapter(private val onDelete: (Note?) -> Unit) :
   }
 
   override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
-    holder.bind(getItem(position), onDelete)
+    holder.bind(getItem(position), onDelete, position)
   }
 
   /** ViewHolder for [NoteListItemAdapter]. */
-  class NoteViewHolder(
+  inner class NoteViewHolder(
     binding: ItemNoteBinding,
   ) : RecyclerView.ViewHolder(binding.root) {
     private val noteTextView = binding.noteText
     private val noteDeleteButtonView = binding.noteDeleteButton
 
-    fun bind(note: Note?, onDelete: (Note?) -> Unit) {
-      noteTextView.text = note?.text
+    fun bind(note: Note?, onDelete: (Note?) -> Unit, position: Int) {
+      val sb = SpannableStringBuilder()
+      val queryList: List<String> = query.split(' ')
+      note?.text?.split(' ')?.forEach {
+        if (queryList.contains(it))
+          sb.bold { append(it) }
+        else
+          sb.append(it)
+        sb.append(" ")
+      }
+
+      sb.removeRange(sb.length-1, sb.length)
+
+      noteTextView.text = sb
+
+      if (position == 0)
+        noteTextView.setBackgroundColor(Color.RED)
+
       noteDeleteButtonView.setOnClickListener { onDelete(note) }
     }
   }
