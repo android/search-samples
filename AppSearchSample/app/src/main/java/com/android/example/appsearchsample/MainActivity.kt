@@ -65,7 +65,7 @@ class MainActivity : AppCompatActivity() {
     noteViewModel.queryNotes().observe(
       this,
       {
-        notesAdapter.submitList(it.map { it2 -> it2.genericDocument.toDocumentClass(Note::class.java) })
+        notesAdapter.submitList(it)
         activityBinding.progressSpinner.visibility = View.GONE
         if (it.isEmpty()) {
           activityBinding.notesList.visibility = View.GONE
@@ -149,7 +149,8 @@ class MainActivity : AppCompatActivity() {
   private fun initNoteListView() {
     notesAdapter = NoteListItemAdapter {
       if (it != null) {
-        noteViewModel.removeNote(it.namespace, it.id)
+        val note = it.genericDocument.toDocumentClass(Note::class.java)
+        noteViewModel.removeNote(note.namespace, note.id)
       }
     }
     activityBinding.notesList.adapter = notesAdapter

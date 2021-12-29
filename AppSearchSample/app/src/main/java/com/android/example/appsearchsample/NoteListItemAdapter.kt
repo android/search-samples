@@ -16,9 +16,13 @@
 package com.android.example.appsearchsample
 
 import android.graphics.Color
+import android.graphics.Typeface.BOLD
+import android.text.Spannable
 import android.text.SpannableStringBuilder
+import android.text.style.StyleSpan
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.appsearch.app.SearchResult
 import androidx.core.text.bold
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -29,10 +33,11 @@ import com.android.example.appsearchsample.model.Note
 /**
  * Adapter for displaying a list of [Note] objects.
  */
-class NoteListItemAdapter(private val onDelete: (Note?) -> Unit) :
-  ListAdapter<Note, NoteListItemAdapter.NoteViewHolder>(NOTES_COMPARATOR) {
+class NoteListItemAdapter(private val onDelete: (SearchResult?) -> Unit) :
+  ListAdapter<SearchResult, NoteListItemAdapter.NoteViewHolder>(NOTES_COMPARATOR) {
 
   var query: String = ""
+  var snippets: List<List<SearchResult.MatchInfo>>? = null
 
   override fun onCreateViewHolder(
     parent: ViewGroup,
@@ -58,37 +63,35 @@ class NoteListItemAdapter(private val onDelete: (Note?) -> Unit) :
     private val noteTextView = binding.noteText
     private val noteDeleteButtonView = binding.noteDeleteButton
 
-    fun bind(note: Note?, onDelete: (Note?) -> Unit, position: Int) {
-      val sb = SpannableStringBuilder()
-      val queryList: List<String> = query.split(' ')
-      note?.text?.split(' ')?.forEach {
-        if (queryList.contains(it))
-          sb.bold { append(it) }
-        else
-          sb.append(it)
-        sb.append(" ")
-      }
+    fun bind(sr: SearchResult, onDelete: (SearchResult?) -> Unit, position: Int) {
+      val note = sr.genericDocument.toDocumentClass(Note::class.java)
+      val sb = SpannableStringBuilder(note.text)
 
-      sb.removeRange(sb.length-1, sb.length)
+      sr.matchInfos.forEach {
+        sb.setSpan(StyleSpan(BOLD), it.exactMatchRange.start, it.exactMatchRange.end, Spannable.SPAN_INCLUSIVE_INCLUSIVE)
+      }
 
       noteTextView.text = sb
 
       if (position == 0)
         noteTextView.setBackgroundColor(Color.RED)
 
-      noteDeleteButtonView.setOnClickListener { onDelete(note) }
+      noteDeleteButtonView.setOnClickListener { onDelete(sr) }
     }
   }
 
   companion object {
-    private val NOTES_COMPARATOR = object : DiffUtil.ItemCallback<Note>() {
-      override fun areItemsTheSame(oldItem: Note, newItem: Note): Boolean {
-        return oldItem.id === newItem.id &&
-          oldItem.namespace === newItem.namespace
+    private val NOTES_COMPARATOR = object : DiffUtil.ItemCallback<SearchResult>() {
+      override fun areItemsTheSame(oldItem: SearchResult, newItem: SearchResult): Boolean {
+        val oi = oldItem.genericDocument.toDocumentClass(Note::class.java)
+        val ni = newItem.genericDocument.toDocumentClass(Note::class.java)
+        return oi.id === ni.id &&
+          oi.namespace === ni.namespace
       }
 
-      override fun areContentsTheSame(oldItem: Note, newItem: Note): Boolean {
-        return oldItem == newItem
+      override fun areContentsTheSame(oldItem: SearchResult, newItem: SearchResult): Boolean {
+        return oldItem.genericDocument.toDocumentClass(Note::class.java) ==
+          newItem.genericDocument.toDocumentClass(Note::class.java)
       }
     }
   }

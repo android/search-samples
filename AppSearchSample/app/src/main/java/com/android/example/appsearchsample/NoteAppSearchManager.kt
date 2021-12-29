@@ -100,6 +100,7 @@ class NoteAppSearchManager(context: Context, coroutineScope: CoroutineScope) {
 
     val searchSpec = SearchSpec.Builder()
       .setRankingStrategy(RANKING_STRATEGY_CREATION_TIMESTAMP)
+      .setSnippetCount(10)
       .build()
 
     val searchResults = appSearchSession.search(query, searchSpec)
