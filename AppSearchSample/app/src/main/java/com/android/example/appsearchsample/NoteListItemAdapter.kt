@@ -23,7 +23,6 @@ import android.text.style.StyleSpan
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.appsearch.app.SearchResult
-import androidx.core.text.bold
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -73,8 +72,7 @@ class NoteListItemAdapter(private val onDelete: (SearchResult?) -> Unit) :
 
       noteTextView.text = sb
 
-      if (position == 0)
-        noteTextView.setBackgroundColor(Color.RED)
+      noteTextView.setBackgroundColor(Color.parseColor(note.color))
 
       noteDeleteButtonView.setOnClickListener { onDelete(sr) }
     }

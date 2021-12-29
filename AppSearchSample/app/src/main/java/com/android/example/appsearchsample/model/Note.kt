@@ -15,6 +15,7 @@
  */
 package com.android.example.appsearchsample.model
 
+import android.graphics.Color
 import androidx.appsearch.annotation.Document
 import androidx.appsearch.app.AppSearchSchema
 import androidx.appsearch.app.GenericDocument
@@ -41,5 +42,10 @@ data class Note(
   @Document.StringProperty(
     indexingType = AppSearchSchema.StringPropertyConfig.INDEXING_TYPE_PREFIXES
   )
-  val text: String
+  val text: String,
+
+  @Document.StringProperty(
+    indexingType = AppSearchSchema.StringPropertyConfig.INDEXING_TYPE_PREFIXES
+  )
+  val color: String
 )

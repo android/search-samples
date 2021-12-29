@@ -55,7 +55,8 @@ class NoteViewModel(application: Application) : AndroidViewModel(application) {
    */
   fun addNote(text: String) {
     val id = UUID.randomUUID().toString()
-    val note = Note(id = id, text = text)
+    val colors: List<String> = listOf("blue", "red", "yellow", "green")
+    val note = Note(id = id, text = text, color = colors.random())
     viewModelScope.launch {
       val result = noteAppSearchManager.addNote(note)
       if (!result.isSuccess) {
