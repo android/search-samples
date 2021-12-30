@@ -99,7 +99,6 @@ class MainActivity : AppCompatActivity() {
     searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
       override fun onQueryTextSubmit(query: String): Boolean {
         noteViewModel.queryNotes(query)
-        notesAdapter.query = query
         return false
       }
 

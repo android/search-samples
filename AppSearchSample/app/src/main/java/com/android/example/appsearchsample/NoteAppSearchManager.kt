@@ -91,9 +91,11 @@ class NoteAppSearchManager(context: Context, coroutineScope: CoroutineScope) {
   /**
    * Queries the AppSearch database for matching [Note] documents.
    *
-   * @return a list of [Note] documents. This returns documents in the order
+   * @return a list of [SearchResult]. This returns SearchResults in the order
    * they were created (with most recent first). This returns a maximum of 10
-   * documents that match the query, per AppSearch default page size.
+   * SearchResults that match the query, per AppSearch default page size.
+   * Snippets are returned for the first 10 results, so if the user expects more
+   * than 10 query matches to be bolded, this may lead to unexpected behavior
    */
   suspend fun queryLatestNotes(query: String): List<SearchResult> {
     awaitInitialization()

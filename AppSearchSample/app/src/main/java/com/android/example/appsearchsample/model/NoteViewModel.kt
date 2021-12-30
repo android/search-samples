@@ -89,10 +89,10 @@ class NoteViewModel(application: Application) : AndroidViewModel(application) {
   }
 
   /**
-   * Retrieves [Note] documents that match the query from the AppSearch
+   * Retrieves [SearchResult] objects that match the query from the AppSearch
    * database.
    *
-   * If no query is provided, this retrieves all [Note] documents in the
+   * If no query is provided, this retrieves all [SearchResult] objects in the
    * database.
    */
   fun queryNotes(query: String = ""): LiveData<List<SearchResult>> {

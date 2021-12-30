@@ -35,9 +35,6 @@ import com.android.example.appsearchsample.model.Note
 class NoteListItemAdapter(private val onDelete: (SearchResult?) -> Unit) :
   ListAdapter<SearchResult, NoteListItemAdapter.NoteViewHolder>(NOTES_COMPARATOR) {
 
-  var query: String = ""
-  var snippets: List<List<SearchResult.MatchInfo>>? = null
-
   override fun onCreateViewHolder(
     parent: ViewGroup,
     viewType: Int
@@ -52,7 +49,7 @@ class NoteListItemAdapter(private val onDelete: (SearchResult?) -> Unit) :
   }
 
   override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
-    holder.bind(getItem(position), onDelete, position)
+    holder.bind(getItem(position), onDelete)
   }
 
   /** ViewHolder for [NoteListItemAdapter]. */
@@ -62,19 +59,17 @@ class NoteListItemAdapter(private val onDelete: (SearchResult?) -> Unit) :
     private val noteTextView = binding.noteText
     private val noteDeleteButtonView = binding.noteDeleteButton
 
-    fun bind(sr: SearchResult, onDelete: (SearchResult?) -> Unit, position: Int) {
-      val note = sr.genericDocument.toDocumentClass(Note::class.java)
-      val sb = SpannableStringBuilder(note.text)
+    fun bind(searchResult: SearchResult, onDelete: (SearchResult?) -> Unit) {
+      val note = searchResult.genericDocument.toDocumentClass(Note::class.java)
+      val stringBuilder = SpannableStringBuilder(note.text)
 
-      sr.matchInfos.forEach {
-        sb.setSpan(StyleSpan(BOLD), it.exactMatchRange.start, it.exactMatchRange.end, Spannable.SPAN_INCLUSIVE_INCLUSIVE)
+      searchResult.matchInfos.forEach {
+        stringBuilder.setSpan(StyleSpan(BOLD), it.exactMatchRange.start, it.exactMatchRange.end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
       }
 
-      noteTextView.text = sb
+      noteTextView.text = stringBuilder
 
-      noteTextView.setBackgroundColor(Color.parseColor(note.color))
-
-      noteDeleteButtonView.setOnClickListener { onDelete(sr) }
+      noteDeleteButtonView.setOnClickListener { onDelete(searchResult) }
     }
   }
 
@@ -88,8 +83,7 @@ class NoteListItemAdapter(private val onDelete: (SearchResult?) -> Unit) :
       }
 
       override fun areContentsTheSame(oldItem: SearchResult, newItem: SearchResult): Boolean {
-        return oldItem.genericDocument.toDocumentClass(Note::class.java) ==
-          newItem.genericDocument.toDocumentClass(Note::class.java)
+        return oldItem == newItem
       }
     }
   }

@@ -43,9 +43,4 @@ data class Note(
     indexingType = AppSearchSchema.StringPropertyConfig.INDEXING_TYPE_PREFIXES
   )
   val text: String,
-
-  @Document.StringProperty(
-    indexingType = AppSearchSchema.StringPropertyConfig.INDEXING_TYPE_PREFIXES
-  )
-  val color: String
 )
