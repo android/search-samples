@@ -64,7 +64,8 @@ class NoteListItemAdapter(private val onDelete: (SearchResult?) -> Unit) :
       val stringBuilder = SpannableStringBuilder(note.text)
 
       searchResult.matchInfos.forEach {
-        stringBuilder.setSpan(StyleSpan(BOLD), it.exactMatchRange.start, it.exactMatchRange.end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        if(it.propertyPath == "text")
+          stringBuilder.setSpan(StyleSpan(BOLD), it.exactMatchRange.start, it.exactMatchRange.end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
       }
 
       noteTextView.text = stringBuilder
