@@ -15,7 +15,6 @@
  */
 package com.android.example.appsearchsample.model
 
-import android.graphics.Color
 import androidx.appsearch.annotation.Document
 import androidx.appsearch.app.AppSearchSchema
 import androidx.appsearch.app.GenericDocument
