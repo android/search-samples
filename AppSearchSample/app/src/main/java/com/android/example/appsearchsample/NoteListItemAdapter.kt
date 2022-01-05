@@ -64,7 +64,7 @@ class NoteListItemAdapter(private val onDelete: (SearchResult?) -> Unit) :
       val stringBuilder = SpannableStringBuilder(note.text)
 
       searchResult.matchInfos.forEach {
-        if(it.propertyPath == "text")
+        if(it.propertyPath == TEXT_PROPERTY_PATH)
           stringBuilder.setSpan(StyleSpan(BOLD), it.exactMatchRange.start, it.exactMatchRange.end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
       }
 
@@ -75,6 +75,8 @@ class NoteListItemAdapter(private val onDelete: (SearchResult?) -> Unit) :
   }
 
   companion object {
+    private val TEXT_PROPERTY_PATH = "text"
+
     private val NOTES_COMPARATOR = object : DiffUtil.ItemCallback<SearchResult>() {
       override fun areItemsTheSame(oldItem: SearchResult, newItem: SearchResult): Boolean {
         val oi = oldItem.genericDocument.toDocumentClass(Note::class.java)
@@ -84,7 +86,9 @@ class NoteListItemAdapter(private val onDelete: (SearchResult?) -> Unit) :
       }
 
       override fun areContentsTheSame(oldItem: SearchResult, newItem: SearchResult): Boolean {
-        return oldItem == newItem
+        return oldItem.genericDocument == newItem.genericDocument &&
+          oldItem.genericDocument.toDocumentClass(Note::class.java) ==
+          newItem.genericDocument.toDocumentClass(Note::class.java)
       }
     }
   }
