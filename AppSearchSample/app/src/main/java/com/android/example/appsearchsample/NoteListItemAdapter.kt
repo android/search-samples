@@ -86,9 +86,7 @@ class NoteListItemAdapter(private val onDelete: (SearchResult?) -> Unit) :
       }
 
       override fun areContentsTheSame(oldItem: SearchResult, newItem: SearchResult): Boolean {
-        return oldItem.genericDocument == newItem.genericDocument &&
-          oldItem.genericDocument.toDocumentClass(Note::class.java) ==
-          newItem.genericDocument.toDocumentClass(Note::class.java)
+        return oldItem.genericDocument == newItem.genericDocument
       }
     }
   }

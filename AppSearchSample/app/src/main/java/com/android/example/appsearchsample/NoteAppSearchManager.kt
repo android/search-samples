@@ -94,7 +94,7 @@ class NoteAppSearchManager(context: Context, coroutineScope: CoroutineScope) {
    * @return a list of [SearchResult] objects. This returns SearchResults in the order
    * they were created (with most recent first). This returns a maximum of 10
    * SearchResults that match the query, per AppSearch default page size.
-   * Snippets are returned for the first 10 results
+   * Snippets are returned for the first 10 results.
    */
   suspend fun queryLatestNotes(query: String): List<SearchResult> {
     awaitInitialization()
