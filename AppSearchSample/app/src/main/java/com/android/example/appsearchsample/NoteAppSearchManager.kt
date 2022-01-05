@@ -20,6 +20,7 @@ import androidx.appsearch.app.AppSearchBatchResult
 import androidx.appsearch.app.AppSearchSession
 import androidx.appsearch.app.PutDocumentsRequest
 import androidx.appsearch.app.RemoveByDocumentIdRequest
+import androidx.appsearch.app.SearchResult
 import androidx.appsearch.app.SearchSpec
 import androidx.appsearch.app.SearchSpec.RANKING_STRATEGY_CREATION_TIMESTAMP
 import androidx.appsearch.app.SetSchemaRequest
@@ -90,22 +91,21 @@ class NoteAppSearchManager(context: Context, coroutineScope: CoroutineScope) {
   /**
    * Queries the AppSearch database for matching [Note] documents.
    *
-   * @return a list of [Note] documents. This returns documents in the order
+   * @return a list of [SearchResult] objects. This returns SearchResults in the order
    * they were created (with most recent first). This returns a maximum of 10
-   * documents that match the query, per AppSearch default page size.
+   * SearchResults that match the query, per AppSearch default page size.
+   * Snippets are returned for the first 10 results.
    */
-  suspend fun queryLatestNotes(query: String): List<Note> {
+  suspend fun queryLatestNotes(query: String): List<SearchResult> {
     awaitInitialization()
 
     val searchSpec = SearchSpec.Builder()
       .setRankingStrategy(RANKING_STRATEGY_CREATION_TIMESTAMP)
+      .setSnippetCount(10)
       .build()
 
     val searchResults = appSearchSession.search(query, searchSpec)
-    val searchResultsPage = searchResults.nextPage.await()
-    return searchResultsPage.map {
-      it.genericDocument.toDocumentClass(Note::class.java)
-    }
+    return searchResults.nextPage.await()
   }
 
   /**

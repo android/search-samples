@@ -148,7 +148,8 @@ class MainActivity : AppCompatActivity() {
   private fun initNoteListView() {
     notesAdapter = NoteListItemAdapter {
       if (it != null) {
-        noteViewModel.removeNote(it.namespace, it.id)
+        val note = it.genericDocument.toDocumentClass(Note::class.java)
+        noteViewModel.removeNote(note.namespace, note.id)
       }
     }
     activityBinding.notesList.adapter = notesAdapter
