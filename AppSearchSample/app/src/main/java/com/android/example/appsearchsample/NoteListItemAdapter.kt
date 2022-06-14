@@ -15,18 +15,19 @@
  */
 package com.android.example.appsearchsample
 
-import android.graphics.Color
 import android.graphics.Typeface.BOLD
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.style.StyleSpan
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.TextView
 import androidx.appsearch.app.SearchResult
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.android.example.appsearchsample.databinding.ItemNoteBinding
 import com.android.example.appsearchsample.model.Note
 
 /**
@@ -37,14 +38,10 @@ class NoteListItemAdapter(private val onDelete: (SearchResult?) -> Unit) :
 
   override fun onCreateViewHolder(
     parent: ViewGroup,
-    viewType: Int
+    viewType: Int,
   ): NoteViewHolder {
-    val view: ItemNoteBinding = ItemNoteBinding.inflate(
-      LayoutInflater.from(parent.context),
-      parent,
-      /*attachToRoot=*/false
-    )
-
+    val view = LayoutInflater.from(parent.context)
+      .inflate(R.layout.item_note, parent, /*attachToRoot=*/false);
     return NoteViewHolder(view)
   }
 
@@ -54,18 +51,26 @@ class NoteListItemAdapter(private val onDelete: (SearchResult?) -> Unit) :
 
   /** ViewHolder for [NoteListItemAdapter]. */
   inner class NoteViewHolder(
-    binding: ItemNoteBinding,
-  ) : RecyclerView.ViewHolder(binding.root) {
-    private val noteTextView = binding.noteText
-    private val noteDeleteButtonView = binding.noteDeleteButton
+    view: View,
+  ) : RecyclerView.ViewHolder(view) {
+    val noteTextView: TextView
+    val noteDeleteButtonView: Button
+
+    init {
+      noteTextView = view.findViewById(R.id.note_text)
+      noteDeleteButtonView = view.findViewById(R.id.note_delete_button)
+    }
 
     fun bind(searchResult: SearchResult, onDelete: (SearchResult?) -> Unit) {
       val note = searchResult.genericDocument.toDocumentClass(Note::class.java)
       val stringBuilder = SpannableStringBuilder(note.text)
 
       searchResult.matchInfos.forEach {
-        if(it.propertyPath == TEXT_PROPERTY_PATH)
-          stringBuilder.setSpan(StyleSpan(BOLD), it.exactMatchRange.start, it.exactMatchRange.end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        if (it.propertyPath == TEXT_PROPERTY_PATH)
+          stringBuilder.setSpan(StyleSpan(BOLD),
+                                it.exactMatchRange.start,
+                                it.exactMatchRange.end,
+                                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
       }
 
       noteTextView.text = stringBuilder
