@@ -53,13 +53,8 @@ class NoteListItemAdapter(private val onDelete: (SearchResult?) -> Unit) :
   inner class NoteViewHolder(
     view: View,
   ) : RecyclerView.ViewHolder(view) {
-    val noteTextView: TextView
-    val noteDeleteButtonView: Button
-
-    init {
-      noteTextView = view.findViewById(R.id.note_text)
-      noteDeleteButtonView = view.findViewById(R.id.note_delete_button)
-    }
+    val noteTextView: TextView = view.findViewById(R.id.note_text)
+    val noteDeleteButtonView: Button = view.findViewById(R.id.note_delete_button)
 
     fun bind(searchResult: SearchResult, onDelete: (SearchResult?) -> Unit) {
       val note = searchResult.genericDocument.toDocumentClass(Note::class.java)
