@@ -18,8 +18,11 @@ package com.android.example.appsearchsample
 import android.os.Bundle
 import android.view.Menu
 import android.view.View
+import android.widget.Button
 import android.widget.EditText
+import android.widget.ProgressBar
 import android.widget.SearchView
+import android.widget.TextView
 import android.widget.Toast
 import android.widget.Toast.LENGTH_LONG
 import androidx.activity.viewModels
@@ -27,10 +30,9 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.android.example.appsearchsample.databinding.ActivityMainBinding
+import androidx.recyclerview.widget.RecyclerView
 import com.android.example.appsearchsample.model.Note
 import com.android.example.appsearchsample.model.NoteViewModel
-import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 
 /**
  * Activity to set up a simple AppSearch demo.
@@ -49,15 +51,23 @@ class MainActivity : AppCompatActivity() {
     NoteViewModel.NoteViewModelFactory(application)
   }
 
-  private lateinit var activityBinding: ActivityMainBinding
+  private lateinit var progressSpinner: ProgressBar
+  private lateinit var notesList: RecyclerView
+  private lateinit var noNotesMessage: TextView
+  private lateinit var insertNoteButton: Button
+
   private lateinit var searchView: SearchView
   private lateinit var notesAdapter: NoteListItemAdapter
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
-    activityBinding = ActivityMainBinding.inflate(layoutInflater)
-    setContentView(activityBinding.root)
+    setContentView(R.layout.activity_main)
+    progressSpinner = findViewById(R.id.progress_spinner)
+    notesList = findViewById(R.id.notes_list)
+    noNotesMessage = findViewById(R.id.no_notes_message)
+    insertNoteButton = findViewById(R.id.insert_note_button)
+
 
     initAddNoteButtonListener()
     initNoteListView()
@@ -66,13 +76,13 @@ class MainActivity : AppCompatActivity() {
       this,
       {
         notesAdapter.submitList(it)
-        activityBinding.progressSpinner.visibility = View.GONE
+        progressSpinner.visibility = View.GONE
         if (it.isEmpty()) {
-          activityBinding.notesList.visibility = View.GONE
-          activityBinding.noNotesMessage.visibility = View.VISIBLE
+          notesList.visibility = View.GONE
+          noNotesMessage.visibility = View.VISIBLE
         } else {
-          activityBinding.notesList.visibility = View.VISIBLE
-          activityBinding.noNotesMessage.visibility = View.GONE
+          notesList.visibility = View.VISIBLE
+          noNotesMessage.visibility = View.GONE
         }
       }
     )
@@ -118,9 +128,6 @@ class MainActivity : AppCompatActivity() {
    * to save as a [Note] document.
    */
   private fun initAddNoteButtonListener() {
-    val insertNoteButton: ExtendedFloatingActionButton =
-      activityBinding.insertNoteButton
-
     insertNoteButton.setOnClickListener {
       val dialogBuilder = AlertDialog.Builder(this@MainActivity)
       dialogBuilder.setView(R.layout.add_note_dialog)
@@ -130,9 +137,9 @@ class MainActivity : AppCompatActivity() {
           val noteEditText =
             addNoteDialogView.findViewById(R.id.add_note_text) as EditText?
           val noteText = noteEditText?.text.toString()
-          activityBinding.progressSpinner.visibility = View.VISIBLE
-          activityBinding.noNotesMessage.visibility = View.GONE
-          activityBinding.notesList.visibility = View.GONE
+          progressSpinner.visibility = View.VISIBLE
+          noNotesMessage.visibility = View.GONE
+          notesList.visibility = View.GONE
           noteViewModel.addNote(noteText)
         }
         .setNegativeButton(R.string.add_note_dialog_cancel) { dialog, _ ->
@@ -152,13 +159,13 @@ class MainActivity : AppCompatActivity() {
         noteViewModel.removeNote(note.namespace, note.id)
       }
     }
-    activityBinding.notesList.adapter = notesAdapter
-    activityBinding.notesList.addItemDecoration(
+    notesList.adapter = notesAdapter
+    notesList.addItemDecoration(
       DividerItemDecoration(
         this,
         LinearLayoutManager.VERTICAL
       )
     )
-    activityBinding.notesList.layoutManager = LinearLayoutManager(this)
+    notesList.layoutManager = LinearLayoutManager(this)
   }
 }
