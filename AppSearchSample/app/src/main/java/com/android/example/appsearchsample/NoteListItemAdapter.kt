@@ -41,7 +41,7 @@ class NoteListItemAdapter(private val onDelete: (SearchResult?) -> Unit) :
     viewType: Int,
   ): NoteViewHolder {
     val view = LayoutInflater.from(parent.context)
-      .inflate(R.layout.item_note, parent, /*attachToRoot=*/false);
+      .inflate(R.layout.item_note, parent, /*attachToRoot=*/false)
     return NoteViewHolder(view)
   }
 
