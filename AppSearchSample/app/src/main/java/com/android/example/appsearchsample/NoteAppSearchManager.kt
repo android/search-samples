@@ -51,11 +51,11 @@ class NoteAppSearchManager(context: Context, coroutineScope: CoroutineScope) {
       // Creates a [AppSearchSession], for S+ devices uses PlatformStorage, for R- devices uses
       // LocalStorage session.
       appSearchSession = if (BuildCompat.isAtLeastS()) {
-        PlatformStorage.createSearchSession(
+        PlatformStorage.createSearchSessionAsync(
           PlatformStorage.SearchContext.Builder(context, DATABASE_NAME).build()
         ).await()
       } else {
-        LocalStorage.createSearchSession(
+        LocalStorage.createSearchSessionAsync(
           LocalStorage.SearchContext.Builder(context, DATABASE_NAME).build()
         ).await()
       }
@@ -65,7 +65,7 @@ class NoteAppSearchManager(context: Context, coroutineScope: CoroutineScope) {
         // schema type in the overall database schema.
         val setSchemaRequest =
           SetSchemaRequest.Builder().addDocumentClasses(Note::class.java).build()
-        appSearchSession.setSchema(setSchemaRequest).await()
+        appSearchSession.setSchemaAsync(setSchemaRequest).await()
 
         // Set the [NoteAppSearchManager] instance as initialized to allow AppSearch operations to
         // be called.
@@ -85,7 +85,7 @@ class NoteAppSearchManager(context: Context, coroutineScope: CoroutineScope) {
     awaitInitialization()
 
     val request = PutDocumentsRequest.Builder().addDocuments(note).build()
-    return appSearchSession.put(request).await()
+    return appSearchSession.putAsync(request).await()
   }
 
   /**
@@ -105,7 +105,7 @@ class NoteAppSearchManager(context: Context, coroutineScope: CoroutineScope) {
       .build()
 
     val searchResults = appSearchSession.search(query, searchSpec)
-    return searchResults.nextPage.await()
+    return searchResults.nextPageAsync.await()
   }
 
   /**
@@ -120,7 +120,7 @@ class NoteAppSearchManager(context: Context, coroutineScope: CoroutineScope) {
 
     val request =
       RemoveByDocumentIdRequest.Builder(namespace).addIds(id).build()
-    return appSearchSession.remove(request).await()
+    return appSearchSession.removeAsync(request).await()
   }
 
   /**

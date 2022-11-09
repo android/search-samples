@@ -68,7 +68,6 @@ class MainActivity : AppCompatActivity() {
     noNotesMessage = findViewById(R.id.no_notes_message)
     insertNoteButton = findViewById(R.id.insert_note_button)
 
-
     initAddNoteButtonListener()
     initNoteListView()
 

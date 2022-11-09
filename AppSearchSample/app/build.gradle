@@ -21,6 +21,7 @@ plugins {
 }
 
 android {
+    namespace 'com.android.example.appsearchsample'
     compileSdkVersion 31
     buildToolsVersion "30.0.3"
 
