@@ -22,9 +22,20 @@
     android:padding="6dp">
 
   <EditText
+      android:id="@+id/add_note_title"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_alignParentTop="true"
+      android:gravity="top"
+      android:maxLength="40"
+      android:inputType="text"
+      android:hint="@string/add_note_title_hint" />
+
+  <EditText
       android:id="@+id/add_note_text"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
+      android:layout_below="@+id/add_note_title"
       android:gravity="top"
       android:maxLength="256"
       android:inputType="textMultiLine"

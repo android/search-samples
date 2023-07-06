@@ -54,6 +54,7 @@ class NoteListItemAdapter(private val onDelete: (SearchResult?) -> Unit) :
     view: View,
   ) : RecyclerView.ViewHolder(view) {
     val noteTextView: TextView = view.findViewById(R.id.note_text)
+    val noteTitleView: TextView = view.findViewById(R.id.note_title)
     val noteDeleteButtonView: Button = view.findViewById(R.id.note_delete_button)
 
     fun bind(searchResult: SearchResult, onDelete: (SearchResult?) -> Unit) {
@@ -69,6 +70,7 @@ class NoteListItemAdapter(private val onDelete: (SearchResult?) -> Unit) :
       }
 
       noteTextView.text = stringBuilder
+      noteTitleView.text = note.title
 
       noteDeleteButtonView.setOnClickListener { onDelete(searchResult) }
     }
