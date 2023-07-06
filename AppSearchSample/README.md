@@ -1,6 +1,15 @@
 
-Android AppSearch Sample (Kotlin)
+Android AppSearch Hands-On Session Starter
 =======================
+
+Overview
+--------
+
+This is the starter code for the DataVerse devices track hands-on session. 
+Be sure that you are able to run this application on device prior to the session.
+You won't be able to save or search documents, but that will be added during the session. 
+
+If you run into issues running the app, please ping alexsav@ to get a fix quickly.
 
 Features
 --------
@@ -27,16 +36,3 @@ Getting Started
 
 This sample uses the Gradle build system. To build this project, use the
 "gradlew build" command or use "Import Project" in Android Studio.
-
-Support
--------
-
-- Issue Tracker:
-  - https://issuetracker.google.com/issues/new?component=1012737&template=1551039
-
-If you've found an error in this sample, please file an issue:
-https://github.com/android/search-samples/issues
-
-Patches are encouraged, and may be submitted by forking this project and
-submitting a pull request through GitHub. Please see CONTRIBUTING.md for more
-details.

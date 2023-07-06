@@ -55,13 +55,9 @@ class NoteViewModel(application: Application) : AndroidViewModel(application) {
    */
   fun addNote(text: String, title: String) {
     val id = UUID.randomUUID().toString()
-    val note = Note(id = id, text = text, title = title)
+    val note = Note(id = id)
     viewModelScope.launch {
-      val result = noteAppSearchManager.addNote(note)
-      if (!result.isSuccess) {
-        _errorMessageLiveData.postValue("Failed to add note with id: $id, text: $text, and title: $title")
-      }
-
+      noteAppSearchManager.addNote(note)
       queryNotes()
     }
   }
@@ -76,12 +72,7 @@ class NoteViewModel(application: Application) : AndroidViewModel(application) {
    */
   fun removeNote(namespace: String, id: String) {
     viewModelScope.launch {
-      val result = noteAppSearchManager.removeNote(namespace, id)
-      if (!result.isSuccess) {
-        _errorMessageLiveData.postValue(
-          "Failed to remove note in namespace: $namespace with id: $id"
-        )
-      }
+      noteAppSearchManager.removeNote(namespace, id)
 
       queryNotes()
     }

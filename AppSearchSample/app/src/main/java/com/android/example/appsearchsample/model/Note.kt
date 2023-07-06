@@ -16,16 +16,9 @@
 package com.android.example.appsearchsample.model
 
 import androidx.appsearch.annotation.Document
-import androidx.appsearch.app.AppSearchSchema
-import androidx.appsearch.app.GenericDocument
 
 /**
  * Data representation for a user-created [Note] object.
- *
- * The [Document] annotation marks this class as an AppSearch document class.
- * This allows the AppSearch compiler to generate classes required to convert
- * this class to and from [GenericDocument], the basic unit of data in
- * AppSearch.
  */
 @Document
 data class Note(
@@ -36,16 +29,4 @@ data class Note(
   /** Id for Note */
   @Document.Id
   val id: String,
-
-  /** Field for text that that user inputs */
-  @Document.StringProperty(
-    indexingType = AppSearchSchema.StringPropertyConfig.INDEXING_TYPE_PREFIXES
-  )
-  val text: String,
-
-  /** Field for a note title that that user inputs */
-  @Document.StringProperty(
-    indexingType = AppSearchSchema.StringPropertyConfig.INDEXING_TYPE_PREFIXES
-  )
-  val title: String
 )
