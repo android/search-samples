@@ -15,6 +15,10 @@
  */
 package com.android.example.appsearchsample
 
+import android.graphics.Typeface.BOLD
+import android.text.Spannable
+import android.text.SpannableStringBuilder
+import android.text.style.StyleSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -54,6 +58,20 @@ class NoteListItemAdapter(private val onDelete: (SearchResult?) -> Unit) :
     val noteDeleteButtonView: Button = view.findViewById(R.id.note_delete_button)
 
     fun bind(searchResult: SearchResult, onDelete: (SearchResult?) -> Unit) {
+      val note = searchResult.genericDocument.toDocumentClass(Note::class.java)
+      val stringBuilder = SpannableStringBuilder(note.text)
+
+      searchResult.matchInfos.forEach {
+        if (it.propertyPath == TEXT_PROPERTY_PATH)
+          stringBuilder.setSpan(StyleSpan(BOLD),
+                                it.exactMatchRange.start,
+                                it.exactMatchRange.end,
+                                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+      }
+
+      noteTextView.text = stringBuilder
+      noteTitleView.text = note.title
+
       noteDeleteButtonView.setOnClickListener { onDelete(searchResult) }
     }
   }

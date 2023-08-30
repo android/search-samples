@@ -16,7 +16,18 @@
 package com.android.example.appsearchsample
 
 import android.content.Context
+import androidx.appsearch.app.AppSearchBatchResult
+import androidx.appsearch.app.AppSearchSession
+import androidx.appsearch.app.PutDocumentsRequest
+import androidx.appsearch.app.RemoveByDocumentIdRequest
 import androidx.appsearch.app.SearchResult
+import androidx.appsearch.app.SearchSpec
+import androidx.appsearch.app.SearchSpec.RANKING_STRATEGY_CREATION_TIMESTAMP
+import androidx.appsearch.app.SetSchemaRequest
+import androidx.appsearch.localstorage.LocalStorage
+import androidx.appsearch.platformstorage.PlatformStorage
+import androidx.concurrent.futures.await
+import androidx.core.os.BuildCompat
 import com.android.example.appsearchsample.model.Note
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.awaitCancellation
@@ -33,16 +44,36 @@ import kotlinx.coroutines.launch
 class NoteAppSearchManager(context: Context, coroutineScope: CoroutineScope) {
   private val isInitialized: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
+  private lateinit var appSearchSession: AppSearchSession
+
   init {
     coroutineScope.launch {
+      // Creates a [AppSearchSession], for S+ devices uses PlatformStorage, for R- devices uses
+      // LocalStorage session.
+      appSearchSession = if (BuildCompat.isAtLeastS()) {
+        PlatformStorage.createSearchSessionAsync(
+          PlatformStorage.SearchContext.Builder(context, DATABASE_NAME).build()
+        ).await()
+      } else {
+        LocalStorage.createSearchSessionAsync(
+          LocalStorage.SearchContext.Builder(context, DATABASE_NAME).build()
+        ).await()
+      }
 
       try {
+        // Sets the schema for the AppSearch database by registering the [Note] document class as a
+        // schema type in the overall database schema.
+        val setSchemaRequest =
+          SetSchemaRequest.Builder().addDocumentClasses(Note::class.java).build()
+        appSearchSession.setSchemaAsync(setSchemaRequest).await()
+
         // Set the [NoteAppSearchManager] instance as initialized to allow AppSearch operations to
         // be called.
         isInitialized.value = true
 
         awaitCancellation()
       } finally {
+        appSearchSession.close()
       }
     }
   }
@@ -50,8 +81,11 @@ class NoteAppSearchManager(context: Context, coroutineScope: CoroutineScope) {
   /**
    * Adds a [Note] document to the AppSearch database.
    */
-  suspend fun addNote(note: Note) {
+  suspend fun addNote(note: Note): AppSearchBatchResult<String, Void> {
     awaitInitialization()
+
+    val request = PutDocumentsRequest.Builder().addDocuments(note).build()
+    return appSearchSession.putAsync(request).await()
   }
 
   /**
@@ -64,7 +98,14 @@ class NoteAppSearchManager(context: Context, coroutineScope: CoroutineScope) {
    */
   suspend fun queryLatestNotes(query: String): List<SearchResult> {
     awaitInitialization()
-    return emptyList()
+
+    val searchSpec = SearchSpec.Builder()
+      .setRankingStrategy(RANKING_STRATEGY_CREATION_TIMESTAMP)
+      .setSnippetCount(10)
+      .build()
+
+    val searchResults = appSearchSession.search(query, searchSpec)
+    return searchResults.nextPageAsync.await()
   }
 
   /**
@@ -74,9 +115,12 @@ class NoteAppSearchManager(context: Context, coroutineScope: CoroutineScope) {
   suspend fun removeNote(
     namespace: String,
     id: String
-  ) {
+  ): AppSearchBatchResult<String, Void> {
     awaitInitialization()
-    return
+
+    val request =
+      RemoveByDocumentIdRequest.Builder(namespace).addIds(id).build()
+    return appSearchSession.removeAsync(request).await()
   }
 
   /**
