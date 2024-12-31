@@ -41,5 +41,11 @@ data class Note(
   @Document.StringProperty(
     indexingType = AppSearchSchema.StringPropertyConfig.INDEXING_TYPE_PREFIXES
   )
-  val text: String
+  val text: String,
+
+  /** Field for a note title that that user inputs */
+  @Document.StringProperty(
+    indexingType = AppSearchSchema.StringPropertyConfig.INDEXING_TYPE_PREFIXES
+  )
+  val title: String
 )

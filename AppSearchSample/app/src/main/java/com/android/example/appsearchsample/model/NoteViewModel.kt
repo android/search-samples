@@ -53,13 +53,13 @@ class NoteViewModel(application: Application) : AndroidViewModel(application) {
    *
    * @param text text to create [Note] document for.
    */
-  fun addNote(text: String) {
+  fun addNote(text: String, title: String) {
     val id = UUID.randomUUID().toString()
-    val note = Note(id = id, text = text)
+    val note = Note(id = id, text = text, title = title)
     viewModelScope.launch {
       val result = noteAppSearchManager.addNote(note)
       if (!result.isSuccess) {
-        _errorMessageLiveData.postValue("Failed to add note with id: $id and text: $text")
+        _errorMessageLiveData.postValue("Failed to add note with id: $id, text: $text, and title: $title")
       }
 
       queryNotes()

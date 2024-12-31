@@ -135,11 +135,14 @@ class MainActivity : AppCompatActivity() {
           val addNoteDialogView = dialog as AlertDialog
           val noteEditText =
             addNoteDialogView.findViewById(R.id.add_note_text) as EditText?
+          val noteEditTitle =
+            addNoteDialogView.findViewById(R.id.add_note_title) as EditText?
           val noteText = noteEditText?.text.toString()
+          val noteTitle = noteEditTitle?.text.toString()
           progressSpinner.visibility = View.VISIBLE
           noNotesMessage.visibility = View.GONE
           notesList.visibility = View.GONE
-          noteViewModel.addNote(noteText)
+          noteViewModel.addNote(noteText, noteTitle)
         }
         .setNegativeButton(R.string.add_note_dialog_cancel) { dialog, _ ->
           dialog.cancel()

@@ -19,6 +19,7 @@
   <string name="no_notes_message">No notes found! Start by adding a note.</string>
   <string name="search_bar_title">Search Notes</string>
   <string name="search_bar_hint">Enter search text</string>
+  <string name="add_note_title_hint">Enter note title</string>
   <string name="add_note_hint">Enter note text</string>
   <string name="add_note_button_text">Add Note</string>
   <string name="add_note_dialog_title">Add a new note</string>
