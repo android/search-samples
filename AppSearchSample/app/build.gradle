@@ -22,13 +22,13 @@ plugins {
 
 android {
     namespace 'com.android.example.appsearchsample'
-    compileSdkVersion 31
+    compileSdkVersion 35
     buildToolsVersion "30.0.3"
 
     defaultConfig {
         applicationId "com.android.example.appsearchsample"
         minSdkVersion 14
-        targetSdkVersion 31
+        targetSdkVersion 35
         versionCode 1
         versionName "1.0"
         multiDexEnabled = true
